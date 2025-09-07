@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Servicio para la base de datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ""         # Sin contraseña, como pediste
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_DATABASE: restaurante_db    # Nombre de tu base de datos
+    volumes:
+      - db_data:/var/lib/mysql        # Persiste los datos de la base de datos
+    ports:
+      - "3306:3306"                   # Para acceder a la base de datos desde tu máquina
+
+  # Servicio para tu aplicación Spring Boot
+  app:
+    build: .
+    container_name: restaurante_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db                              # Asegura que la base de datos se inicie primero
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/restaurante_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+    volumes:
+      - .:/app
+
+  # Servicio para PHPMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:5.2.1
+    container_name: phpmyadmin_service
+    environment:
+      PMA_HOST: db                      # Conecta a la base de datos 'db'
+    ports:
+      - "8081:80"                     # Accede desde http://localhost:8081
+    depends_on:
+      - db
+
+volumes:
+  db_data:                            # Definición del volumen para persistir la base de datos
