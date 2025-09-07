@@ -6,6 +6,7 @@ import com.ejemplo.restaurante.repository.ClienteRepository;
 import com.ejemplo.restaurante.repository.PedidoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,6 +23,9 @@ public class PedidoBusquedaPorCliente implements PedidoBusquedaStrategy {
     @Override
     public List<Pedido> buscar(String nombreCliente) {
         Cliente cliente = clienteRepository.findByNombre(nombreCliente);
+        if (cliente == null) {
+            return Collections.emptyList();
+        }
         return pedidoRepository.findByCliente(cliente);
     }
 }

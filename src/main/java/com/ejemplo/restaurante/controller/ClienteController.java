@@ -1,32 +1,36 @@
 package com.ejemplo.restaurante.controller;
 
 import com.ejemplo.restaurante.model.Cliente;
-import com.ejemplo.restaurante.repository.ClienteRepository;
+import com.ejemplo.restaurante.dto.MejorClienteDTO; // <- import correcto
+import com.ejemplo.restaurante.service.ClienteService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
 
-    private final ClienteRepository clienteRepository;
+    private final ClienteService clienteService;
 
-    public ClienteController(ClienteRepository clienteRepository) {
-        this.clienteRepository = clienteRepository;
+    public ClienteController(ClienteService clienteService) {
+        this.clienteService = clienteService;
     }
 
     @PostMapping
-    public Cliente crearCliente(@RequestBody Cliente cliente) {
-        return clienteRepository.save(cliente);
+    public ResponseEntity<Cliente> crearCliente(@RequestBody Cliente cliente) {
+        return ResponseEntity.ok(clienteService.guardar(cliente));
     }
 
     @GetMapping
-    public List<Cliente> listarClientes() {
-        return clienteRepository.findAll();
+    public ResponseEntity<List<Cliente>> listarClientes() {
+        return ResponseEntity.ok(clienteService.listarTodos());
     }
 
-    @GetMapping("/{id}")
-    public Cliente obtenerCliente(@PathVariable Long id) {
-        return clienteRepository.findById(id).orElse(null);
+    @GetMapping("/mejor-cliente")
+    public ResponseEntity<MejorClienteDTO> obtenerMejorCliente() {
+        // Cambiamos el tipo de ResponseEntity a MejorClienteDTO
+        return ResponseEntity.ok(clienteService.obtenerMejorCliente());
     }
 }
